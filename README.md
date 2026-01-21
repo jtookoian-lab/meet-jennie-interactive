@@ -38,14 +38,14 @@ This experience reflects how I approach enablement work:
   - Lightweight, intuitive interaction
 
 - **Technical Fluency (Without Over-Engineering)**  
-  - Built with HTML, Tailwind CSS, and vanilla JavaScript  
+  - Built with Canva coding templates and GitHub coding help from ChatGPT 
   - Designed to be simple, portable, and easy to evolve
 
 ---
 
 ## Why a Game?
 
-In enablement, engagement is never accidental.
+In Enablement, engagement is never accidental.
 
 I’ve found that people remember:
 - what surprised them,
