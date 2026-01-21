@@ -1,4 +1,4 @@
-# Meet Jennie 👋  
+# Meet Jennie   
 ### An Interactive Enablement Experience
 
 This project is an intentionally playful way to introduce how I think about **enablement, learning design, and audience engagement**.
@@ -8,7 +8,7 @@ learner-first, conversation-driven, and grounded in learning science.
 
 ---
 
-## 🎮 What This Is
+## What This Is
 
 **Meet Jennie** is an interactive memory game.  
 Each successful match unlocks a conversation starter—designed not as trivia, but as a prompt for meaningful dialogue.
@@ -18,7 +18,7 @@ The goal is to **start better conversations**.
 
 ---
 
-## 🧠 What This Demonstrates
+## What This Demonstrates
 
 This experience reflects how I approach enablement work:
 
@@ -43,7 +43,7 @@ This experience reflects how I approach enablement work:
 
 ---
 
-## 🎯 Why a Game?
+## Why a Game?
 
 In enablement, engagement is never accidental.
 
@@ -56,16 +56,16 @@ This game is a small example of how I design experiences that do exactly that.
 
 ---
 
-## ▶️ Play the Game
+## Play the Game
 
 **Live version:**  
-👉 https://yourusername.github.io/meet-jennie-interactive/
+https://yourusername.github.io/meet-jennie-interactive/
 
 (Replace with your actual link once published.)
 
 ---
 
-## 💬 Want to Go Deeper?
+## Want to Go Deeper?
 
 Every match unlocks a prompt designed to spark a conversation.  
 I’d love to continue one of those in real life.
