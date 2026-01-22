@@ -3,196 +3,101 @@
  <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Meet Jennie - Memory Game</title>
-  <script src="https://cdn.tailwindcss.com"></script>
+  <title>Categorization Game</title>
   <script src="/_sdk/element_sdk.js"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&amp;family=Nunito:wght@400;600;700&amp;display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Work+Sans:wght@400;600;700&amp;display=swap" rel="stylesheet">
   <style>
     body {
       box-sizing: border-box;
+      font-family: 'Work Sans', sans-serif;
     }
     
-    * {
-      font-family: 'Nunito', sans-serif;
+    .dragging {
+      opacity: 0.5;
+      transform: rotate(2deg);
     }
     
-    .game-title {
-      font-family: 'Fredoka', sans-serif;
+    .drag-over {
+      border-color: #00C4CC;
+      background-color: rgba(0, 196, 204, 0.1);
+      transform: scale(1.02);
     }
     
-    .card-container {
-      perspective: 1000px;
+    .item-card {
+      cursor: grab;
+      transition: all 0.2s ease;
     }
     
-    .card {
-      position: relative;
-      transform-style: preserve-3d;
-      transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    .item-card:active {
+      cursor: grabbing;
     }
     
-    .card.flipped {
-      transform: rotateY(180deg);
+    .correct-drop {
+      animation: correctPulse 0.5s ease;
     }
     
-    .card-face {
-      position: absolute;
-      width: 100%;
-      height: 100%;
-      backface-visibility: hidden;
-      border-radius: 16px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
+    .incorrect-drop {
+      animation: incorrectShake 0.5s ease;
     }
     
-    .card-back {
-      transform: rotateY(180deg);
+    @keyframes correctPulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.05); }
     }
     
-    .card.matched {
-      animation: matchPulse 0.5s ease-out;
+    @keyframes incorrectShake {
+      0%, 100% { transform: translateX(0); }
+      25% { transform: translateX(-10px); }
+      75% { transform: translateX(10px); }
     }
     
-    @keyframes matchPulse {
-      0%, 100% { transform: rotateY(180deg) scale(1); }
-      50% { transform: rotateY(180deg) scale(1.1); }
-    }
-    
-    @keyframes confetti {
-      0% { transform: translateY(0) rotate(0deg); opacity: 1; }
-      100% { transform: translateY(-100px) rotate(720deg); opacity: 0; }
-    }
-    
-    .confetti-piece {
-      position: absolute;
-      animation: confetti 1s ease-out forwards;
-    }
-    
-    .question-card {
-      animation: slideIn 0.4s ease-out;
-    }
-    
-    @keyframes slideIn {
-      from { transform: translateY(20px); opacity: 0; }
-      to { transform: translateY(0); opacity: 1; }
-    }
-    
-    .gradient-bg {
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
-    }
-    
-    .card-front-pattern {
-      background: linear-gradient(135deg, #00C4CC 0%, #7B2CBF 100%);
-      position: relative;
-      overflow: hidden;
-    }
-    
-    .card-front-pattern::before {
-      content: '✨';
-      position: absolute;
-      font-size: 24px;
-      opacity: 0.3;
-    }
-    
-    .card-front-pattern::after {
-      content: '🎨';
-      position: absolute;
-      font-size: 20px;
-      opacity: 0.2;
-      bottom: 10px;
-      right: 10px;
+    .bucket {
+      transition: all 0.3s ease;
+      min-height: 200px;
     }
   </style>
   <style>@view-transition { navigation: auto; }</style>
   <script src="/_sdk/data_sdk.js" type="text/javascript"></script>
  </head>
- <body class="h-full gradient-bg overflow-auto">
-  <div id="app" class="min-h-full w-full p-4 md:p-8"><!-- Header -->
-   <header class="text-center mb-6">
-    <h1 id="game-title" class="game-title text-4xl md:text-5xl font-bold text-white drop-shadow-lg mb-2">Meet Jennie</h1>
-    <p id="subtitle" class="text-white/90 text-lg md:text-xl font-medium">A Memory Game for Canva 🎯</p>
-   </header><!-- Stats Bar -->
-   <div class="flex justify-center gap-4 md:gap-8 mb-6">
-    <div class="bg-white/20 backdrop-blur-sm rounded-2xl px-4 py-2 md:px-6 md:py-3"><span class="text-white/80 text-sm">Score</span>
-     <p id="score" class="text-white text-2xl font-bold text-center">0</p>
-    </div>
-    <div class="bg-white/20 backdrop-blur-sm rounded-2xl px-4 py-2 md:px-6 md:py-3"><span class="text-white/80 text-sm">Moves</span>
-     <p id="moves" class="text-white text-2xl font-bold text-center">0</p>
-    </div>
-    <div class="bg-white/20 backdrop-blur-sm rounded-2xl px-4 py-2 md:px-6 md:py-3"><span class="text-white/80 text-sm">Matches</span>
-     <p id="matches" class="text-white text-2xl font-bold text-center">0/6</p>
-    </div>
-   </div><!-- Game Board -->
-   <div id="game-board" class="grid grid-cols-3 md:grid-cols-4 gap-3 md:gap-4 max-w-2xl mx-auto mb-6"><!-- Cards will be generated here -->
-   </div><!-- Question Modal -->
-   <div id="question-modal" class="hidden fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50">
-    <div class="question-card bg-white rounded-3xl p-6 md:p-8 max-w-lg w-full shadow-2xl">
-     <div class="text-center mb-4"><span class="text-4xl mb-2 block" id="question-emoji">💬</span>
-      <h3 class="text-xl md:text-2xl font-bold text-purple-800 mb-2">Conversation Starter!</h3>
-     </div>
-     <p id="question-text" class="text-gray-700 text-lg md:text-xl text-center mb-6 leading-relaxed"></p><button id="close-question" class="w-full bg-gradient-to-r from-purple-600 to-pink-500 text-white font-bold py-3 px-6 rounded-2xl hover:opacity-90 transition-opacity text-lg"> Got it! 👍 </button>
-    </div>
-   </div><!-- Win Modal -->
-   <div id="win-modal" class="hidden fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50">
-    <div class="question-card bg-white rounded-3xl p-6 md:p-8 max-w-lg w-full shadow-2xl text-center"><span class="text-6xl mb-4 block">🎉</span>
-     <h2 class="game-title text-3xl font-bold text-purple-800 mb-2">Amazing!</h2>
-     <p class="text-gray-600 text-lg mb-2">You've completed the game!</p>
-     <p id="win-stats" class="text-purple-600 font-semibold mb-6"></p><button id="play-again" class="w-full bg-gradient-to-r from-purple-600 to-pink-500 text-white font-bold py-3 px-6 rounded-2xl hover:opacity-90 transition-opacity text-lg"> Play Again 🔄 </button>
-    </div>
-   </div><!-- Instructions -->
-   <div class="max-w-2xl mx-auto">
-    <div class="bg-white/10 backdrop-blur-sm rounded-2xl p-4 text-white/90 text-center">
-     <p class="text-sm md:text-base">🎮 <strong>How to play:</strong> Match pairs to unlock conversation starters! Quick matches earn bonus points ⚡</p>
-    </div>
-   </div>
-  </div>
+ <body class="h-full">
+  <div id="app" class="w-full h-full overflow-auto"></div>
   <script>
     const defaultConfig = {
-      game_title: "Meet Jennie",
-      subtitle: "A Memory Game for Canva 🎯",
-      primary_color: "#667eea",
-      secondary_color: "#00C4CC",
-      accent_color: "#f093fb",
-      text_color: "#ffffff",
-      card_color: "#7B2CBF"
+      background_color: "#F7F5FF",
+      card_color: "#FFFFFF",
+      primary_color: "#7D2AE7",
+      accent_color: "#00C4CC",
+      text_color: "#1A1A1A",
+      game_title: "Professional Experience Game",
+      instructions: "Drag each item into the correct category bucket!",
+      category_1_name: "Skills",
+      category_2_name: "Experience",
+      category_3_name: "Results",
+      font_family: "Work Sans",
+      font_size: 16
     };
 
-    const emojis = ['🎓', '🎓', '🎓', '💼', '💼', '💼'];
-    
-    const questions = [
-      // Canva User Journey
-      { emoji: '🎨', text: "Jennie has used Canva for 5-7 years! Ask her: What's the most creative project you've built in Canva?" },
-      { emoji: '💜', text: "Canva went from 'handy free tool' to essential for Jennie! Ask her: What was the turning point when Canva became indispensable?" },
-      { emoji: '🌟', text: "Jennie says 'two worlds are colliding' with this role! Ask her: Why is the Field Enablement position at Canva special to you?" },
-      
-      // Learning Science & M.Ed. Expertise
-      { emoji: '🎓', text: "Jennie has an M.Ed. in learning science! Ask her: How does adult learning theory change how you design training?" },
-      { emoji: '📚', text: "Jennie has formal training in learning science! Ask her: What's one learning principle everyone in enablement should know?" },
-      { emoji: '🎭', text: "Jennie sees enablement as 'scratching the itch to be a teacher'! Ask her: What do you miss most about traditional teaching?" },
-      
-      // GTM & Revenue Enablement Wins
-      { emoji: '🚀', text: "Sellers who passed Jennie's certification increased closed-won deals by 15%! Ask her: What made that program so effective?" },
-      { emoji: '🎯', text: "Jennie helped hit both new business AND renewal targets for the first time ever! Ask her: How did enablement contribute to that success?" },
-      { emoji: '💼', text: "Jennie has 15+ years of SaaS GTM experience! Ask her: What's the biggest change you've seen in how companies enable their teams?" },
-      { emoji: '🔬', text: "Jennie researches audiences using sales data before building programs! Ask her: Walk me through your audience research process." },
-      
-      // Leadership & Coaching Experience
-      { emoji: '🏆', text: "Jennie calls herself 'seasoned'! Ask her: What's one lesson that took years to learn but changed everything?" },
-      { emoji: '👥', text: "Jennie has lived roles across the entire customer lifecycle! Ask her: How does that experience shape your enablement approach?" },
-      { emoji: '💡', text: "Jennie loves prompt engineering and GenAI! Ask her: What's your favorite creative AI application for enablement?" },
-      { emoji: '🌱', text: "Jennie has coached people in sales, marketing, and customer service! Ask her: What's the most rewarding coaching moment you've had?" }
+    // Updated game items with your specific wording
+    const gameItems = [
+      { id: 1, text: "Expert in Learning Science + Adult Learning Theory", category: "skills" },
+      { id: 2, text: "Formally trained as teacher", category: "skills" },
+      { id: 3, text: "15+ years in SaaS GTM and Enablement", category: "experience" },
+      { id: 4, text: "Roles in Marketing, Sales, Customer Service", category: "experience" },
+      { id: 5, text: "Individual Contributor, Coach, and Leadership", category: "experience" },
+      { id: 6, text: "Certified sellers increased 15% in closed-won deals", category: "results" },
+      { id: 7, text: "Hit new business targets for 1st time in company history", category: "results" },
+      { id: 8, text: "Exceeded renewal targets for 1st time in company history", category: "results" },
+      { id: 9, text: "Salesforce, LMS, CMS, Call Intelligence, + more! ", category: "skills" },
+      { id: 10, text: "Onboarding, Everboarding, Product Certification paths", category: "skills" },
+      { id: 11, text: "5+ years in Enablement Lead roles", category: "experience" },
+      { id: 12, text: "Excel w/ cross functional partnering", category: "experience" }
     ];
 
-    let cards = [];
-    let flippedCards = [];
-    let matchedPairs = 0;
-    let moves = 0;
+    let currentDraggedItem = null;
     let score = 0;
-    let questionsAsked = 0;
-    let isProcessing = false;
-    let usedQuestions = [];
-    let startTime = null;
-    let lastMatchTime = null;
+    let totalAttempts = 0;
+    let placedItems = new Set();
 
     function shuffleArray(array) {
       const shuffled = [...array];
@@ -203,232 +108,222 @@
       return shuffled;
     }
 
-    function createCards() {
-      const cardPairs = [...emojis, ...emojis];
-      return shuffleArray(cardPairs).map((emoji, index) => ({
-        id: index,
-        emoji: emoji,
-        isFlipped: false,
-        isMatched: false
-      }));
-    }
-
-    function renderBoard() {
-      const board = document.getElementById('game-board');
-      board.innerHTML = '';
+    function render() {
+      const config = window.elementSdk?.config || defaultConfig;
+      const customFont = config.font_family || defaultConfig.font_family;
+      const baseFontStack = 'Work Sans, sans-serif';
+      const baseSize = config.font_size || defaultConfig.font_size;
       
-      cards.forEach((card, index) => {
-        const cardEl = document.createElement('div');
-        cardEl.className = 'card-container aspect-square cursor-pointer';
-        cardEl.innerHTML = `
-          <div class="card w-full h-full ${card.isFlipped || card.isMatched ? 'flipped' : ''} ${card.isMatched ? 'matched' : ''}" data-id="${card.id}">
-            <div class="card-face card-front card-front-pattern shadow-lg">
-              <span class="text-3xl md:text-4xl text-white/80">?</span>
-            </div>
-            <div class="card-face card-back bg-white shadow-lg">
-              <span class="text-4xl md:text-5xl">${card.emoji}</span>
+      const app = document.getElementById('app');
+      app.style.fontFamily = `${customFont}, ${baseFontStack}`;
+      app.style.backgroundColor = config.background_color || defaultConfig.background_color;
+      
+      const shuffledItems = shuffleArray(gameItems);
+      
+      app.innerHTML = `
+        <div class="w-full min-h-full p-8">
+          <div class="max-w-6xl mx-auto mb-8 text-center">
+            <h1 id="title" class="font-bold mb-3" style="color: ${config.primary_color || defaultConfig.primary_color}; font-size: ${baseSize * 2}px;">
+              ${config.game_title || defaultConfig.game_title}
+            </h1>
+            <p id="instructions" class="mb-4" style="color: ${config.text_color || defaultConfig.text_color}; font-size: ${baseSize * 1.125}px;">
+              ${config.instructions || defaultConfig.instructions}
+            </p>
+            <div id="score-display" class="inline-block px-6 py-3 rounded-lg" style="background-color: ${config.card_color || defaultConfig.card_color}; border: 2px solid ${config.accent_color || defaultConfig.accent_color};">
+              <span style="color: ${config.text_color || defaultConfig.text_color}; font-size: ${baseSize * 1.25}px; font-weight: 600;">Score: <span id="current-score">0</span> / ${gameItems.length}</span>
             </div>
           </div>
-        `;
-        
-        cardEl.addEventListener('click', () => handleCardClick(card.id));
-        board.appendChild(cardEl);
+
+          <div class="max-w-6xl mx-auto">
+            <div class="mb-8">
+              <h2 class="font-semibold mb-4" style="color: ${config.text_color || defaultConfig.text_color}; font-size: ${baseSize * 1.5}px;">Items to Categorize</h2>
+              <div id="items-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                ${shuffledItems.map(item => `
+                  <div 
+                    class="item-card p-4 rounded-lg shadow-md border-2" 
+                    draggable="true" 
+                    data-item-id="${item.id}"
+                    data-category="${item.category}"
+                    style="background-color: ${config.card_color || defaultConfig.card_color}; border-color: ${config.primary_color || defaultConfig.primary_color}; color: ${config.text_color || defaultConfig.text_color}; font-size: ${baseSize}px;"
+                  >
+                    <p class="font-medium">${item.text}</p>
+                  </div>
+                `).join('')}
+              </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div class="bucket rounded-xl p-6 border-4 border-dashed" 
+                   data-bucket="skills"
+                   style="background-color: ${config.card_color || defaultConfig.card_color}; border-color: ${config.primary_color || defaultConfig.primary_color};">
+                <h3 id="cat1-name" class="font-bold mb-4 text-center" style="color: ${config.primary_color || defaultConfig.primary_color}; font-size: ${baseSize * 1.25}px;">
+                  ${config.category_1_name || defaultConfig.category_1_name}
+                </h3>
+                <div class="bucket-items space-y-3" data-bucket-content="skills"></div>
+              </div>
+
+              <div class="bucket rounded-xl p-6 border-4 border-dashed" 
+                   data-bucket="experience"
+                   style="background-color: ${config.card_color || defaultConfig.card_color}; border-color: ${config.accent_color || defaultConfig.accent_color};">
+                <h3 id="cat2-name" class="font-bold mb-4 text-center" style="color: ${config.accent_color || defaultConfig.accent_color}; font-size: ${baseSize * 1.25}px;">
+                  ${config.category_2_name || defaultConfig.category_2_name}
+                </h3>
+                <div class="bucket-items space-y-3" data-bucket-content="experience"></div>
+              </div>
+
+              <div class="bucket rounded-xl p-6 border-4 border-dashed" 
+                   data-bucket="results"
+                   style="background-color: ${config.card_color || defaultConfig.card_color}; border-color: ${config.primary_color || defaultConfig.primary_color};">
+                <h3 id="cat3-name" class="font-bold mb-4 text-center" style="color: ${config.primary_color || defaultConfig.primary_color}; font-size: ${baseSize * 1.25}px;">
+                  ${config.category_3_name || defaultConfig.category_3_name}
+                </h3>
+                <div class="bucket-items space-y-3" data-bucket-content="results"></div>
+              </div>
+            </div>
+
+            <div id="final-message" class="mt-8 text-center hidden">
+              <div class="inline-block p-6 rounded-xl shadow-lg" style="background-color: ${config.card_color || defaultConfig.card_color}; border: 3px solid ${config.accent_color || defaultConfig.accent_color};">
+                <h2 class="font-bold mb-2" style="color: ${config.primary_color || defaultConfig.primary_color}; font-size: ${baseSize * 1.75}px;">🎉 Game Complete!</h2>
+                <p id="final-score-text" class="font-semibold" style="color: ${config.text_color || defaultConfig.text_color}; font-size: ${baseSize * 1.25}px;"></p>
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+
+      setupDragAndDrop();
+    }
+
+    function setupDragAndDrop() {
+      const items = document.querySelectorAll('.item-card');
+      const buckets = document.querySelectorAll('.bucket');
+
+      items.forEach(item => {
+        item.addEventListener('dragstart', handleDragStart);
+        item.addEventListener('dragend', handleDragEnd);
+      });
+
+      buckets.forEach(bucket => {
+        bucket.addEventListener('dragover', handleDragOver);
+        bucket.addEventListener('drop', handleDrop);
+        bucket.addEventListener('dragleave', handleDragLeave);
       });
     }
 
-    function handleCardClick(cardId) {
-      if (isProcessing) return;
+    function handleDragStart(e) {
+      currentDraggedItem = e.target;
+      e.target.classList.add('dragging');
+      e.dataTransfer.effectAllowed = 'move';
+    }
+
+    function handleDragEnd(e) {
+      e.target.classList.remove('dragging');
+    }
+
+    function handleDragOver(e) {
+      e.preventDefault();
+      e.dataTransfer.dropEffect = 'move';
+      const bucket = e.currentTarget;
+      bucket.classList.add('drag-over');
+    }
+
+    function handleDragLeave(e) {
+      const bucket = e.currentTarget;
+      bucket.classList.remove('drag-over');
+    }
+
+    function handleDrop(e) {
+      e.preventDefault();
+      const bucket = e.currentTarget;
+      bucket.classList.remove('drag-over');
       
-      const card = cards.find(c => c.id === cardId);
-      if (!card || card.isFlipped || card.isMatched) return;
+      if (!currentDraggedItem) return;
+
+      const itemId = parseInt(currentDraggedItem.dataset.itemId);
+      const correctCategory = currentDraggedItem.dataset.category;
+      const droppedCategory = bucket.dataset.bucket;
+
+      if (placedItems.has(itemId)) return;
+
+      const bucketContent = bucket.querySelector('.bucket-items');
       
-      // Start timer on first card flip
-      if (startTime === null) {
-        startTime = Date.now();
-        lastMatchTime = startTime;
-      }
-      
-      card.isFlipped = true;
-      flippedCards.push(card);
-      renderBoard();
-      
-      if (flippedCards.length === 2) {
-        isProcessing = true;
-        moves++;
+      if (correctCategory === droppedCategory) {
+        score++;
+        placedItems.add(itemId);
         
-        const [first, second] = flippedCards;
+        currentDraggedItem.classList.add('correct-drop');
+        currentDraggedItem.style.borderColor = '#10B981';
+        currentDraggedItem.style.backgroundColor = '#D1FAE5';
+        currentDraggedItem.draggable = false;
+        currentDraggedItem.style.cursor = 'default';
         
-        if (first.emoji === second.emoji) {
-          first.isMatched = true;
-          second.isMatched = true;
-          matchedPairs++;
-          
-          // Calculate speed bonus (faster = more points)
-          const currentTime = Date.now();
-          const timeSinceLastMatch = (currentTime - lastMatchTime) / 1000; // in seconds
-          lastMatchTime = currentTime;
-          
-          let matchPoints = 100; // Base points for a match
-          
-          // Speed bonus: award extra points for quick matches
-          if (timeSinceLastMatch < 3) {
-            matchPoints += 50; // Lightning fast!
-          } else if (timeSinceLastMatch < 5) {
-            matchPoints += 30; // Very fast
-          } else if (timeSinceLastMatch < 8) {
-            matchPoints += 10; // Quick
-          }
-          
-          score += matchPoints;
-          flippedCards = [];
-          
-          setTimeout(() => {
-            renderBoard();
-            showQuestion();
-            isProcessing = false;
-            updateStats();
-            
-            if (matchedPairs === 6) {
-              setTimeout(showWinModal, 1500);
-            }
-          }, 500);
-        } else {
-          setTimeout(() => {
-            first.isFlipped = false;
-            second.isFlipped = false;
-            flippedCards = [];
-            renderBoard();
-            isProcessing = false;
-            updateStats();
-          }, 1000);
-        }
+        const checkmark = document.createElement('span');
+        checkmark.textContent = ' ✓';
+        checkmark.style.color = '#10B981';
+        checkmark.style.fontWeight = 'bold';
+        currentDraggedItem.querySelector('p').appendChild(checkmark);
+        
+        bucketContent.appendChild(currentDraggedItem);
+        
+      } else {
+        currentDraggedItem.classList.add('incorrect-drop');
+        setTimeout(() => {
+          currentDraggedItem.classList.remove('incorrect-drop');
+        }, 500);
+      }
+
+      totalAttempts++;
+      updateScore();
+      checkGameComplete();
+      
+      currentDraggedItem = null;
+    }
+
+    function updateScore() {
+      document.getElementById('current-score').textContent = score;
+    }
+
+    function checkGameComplete() {
+      if (placedItems.size === gameItems.length) {
+        const finalMessage = document.getElementById('final-message');
+        const finalScoreText = document.getElementById('final-score-text');
+        const percentage = Math.round((score / gameItems.length) * 100);
+        finalScoreText.textContent = `You scored ${score} out of ${gameItems.length} (${percentage}%)`;
+        finalMessage.classList.remove('hidden');
       }
     }
 
-    function showQuestion() {
-      const availableQuestions = questions.filter((_, i) => !usedQuestions.includes(i));
-      if (availableQuestions.length === 0) {
-        usedQuestions = [];
-        return showQuestion();
-      }
-      
-      const randomIndex = Math.floor(Math.random() * availableQuestions.length);
-      const originalIndex = questions.indexOf(availableQuestions[randomIndex]);
-      usedQuestions.push(originalIndex);
-      
-      const question = availableQuestions[randomIndex];
-      questionsAsked++;
-      updateStats();
-      
-      document.getElementById('question-emoji').textContent = question.emoji;
-      document.getElementById('question-text').textContent = question.text;
-      document.getElementById('question-modal').classList.remove('hidden');
-    }
-
-    function updateStats() {
-      document.getElementById('score').textContent = score;
-      document.getElementById('moves').textContent = moves;
-      document.getElementById('matches').textContent = `${matchedPairs}/6`;
-    }
-
-    function showWinModal() {
-      const totalTime = ((Date.now() - startTime) / 1000).toFixed(1);
-      document.getElementById('win-stats').textContent = `Final Score: ${score} points | Completed in ${moves} moves and ${totalTime} seconds!`;
-      document.getElementById('win-modal').classList.remove('hidden');
-    }
-
-    function resetGame() {
-      cards = createCards();
-      flippedCards = [];
-      matchedPairs = 0;
-      moves = 0;
-      score = 0;
-      questionsAsked = 0;
-      usedQuestions = [];
-      isProcessing = false;
-      startTime = null;
-      lastMatchTime = null;
-      updateStats();
-      renderBoard();
-      document.getElementById('win-modal').classList.add('hidden');
-    }
-
-    document.getElementById('close-question').addEventListener('click', () => {
-      document.getElementById('question-modal').classList.add('hidden');
-    });
-
-    document.getElementById('play-again').addEventListener('click', resetGame);
-
-    // Initialize game
-    cards = createCards();
-    renderBoard();
-
-    // Element SDK Integration
     async function onConfigChange(config) {
-      document.getElementById('game-title').textContent = config.game_title || defaultConfig.game_title;
-      document.getElementById('subtitle').textContent = config.subtitle || defaultConfig.subtitle;
-    }
-
-    function mapToCapabilities(config) {
-      return {
-        recolorables: [
-          {
-            get: () => config.primary_color || defaultConfig.primary_color,
-            set: (value) => {
-              config.primary_color = value;
-              window.elementSdk.setConfig({ primary_color: value });
-            }
-          },
-          {
-            get: () => config.secondary_color || defaultConfig.secondary_color,
-            set: (value) => {
-              config.secondary_color = value;
-              window.elementSdk.setConfig({ secondary_color: value });
-            }
-          },
-          {
-            get: () => config.accent_color || defaultConfig.accent_color,
-            set: (value) => {
-              config.accent_color = value;
-              window.elementSdk.setConfig({ accent_color: value });
-            }
-          },
-          {
-            get: () => config.text_color || defaultConfig.text_color,
-            set: (value) => {
-              config.text_color = value;
-              window.elementSdk.setConfig({ text_color: value });
-            }
-          },
-          {
-            get: () => config.card_color || defaultConfig.card_color,
-            set: (value) => {
-              config.card_color = value;
-              window.elementSdk.setConfig({ card_color: value });
-            }
-          }
-        ],
-        borderables: [],
-        fontEditable: undefined,
-        fontSizeable: undefined
-      };
-    }
-
-    function mapToEditPanelValues(config) {
-      return new Map([
-        ["game_title", config.game_title || defaultConfig.game_title],
-        ["subtitle", config.subtitle || defaultConfig.subtitle]
-      ]);
+        // Handle live config updates if necessary
+        render(); 
     }
 
     if (window.elementSdk) {
       window.elementSdk.init({
         defaultConfig,
         onConfigChange,
-        mapToCapabilities,
-        mapToEditPanelValues
+        mapToCapabilities: (config) => ({
+          recolorables: [
+            { get: () => config.background_color || defaultConfig.background_color, set: (v) => window.elementSdk.setConfig({ background_color: v }) },
+            { get: () => config.card_color || defaultConfig.card_color, set: (v) => window.elementSdk.setConfig({ card_color: v }) },
+            { get: () => config.primary_color || defaultConfig.primary_color, set: (v) => window.elementSdk.setConfig({ primary_color: v }) },
+            { get: () => config.accent_color || defaultConfig.accent_color, set: (v) => window.elementSdk.setConfig({ accent_color: v }) },
+            { get: () => config.text_color || defaultConfig.text_color, set: (v) => window.elementSdk.setConfig({ text_color: v }) }
+          ],
+          fontEditable: { get: () => config.font_family || defaultConfig.font_family, set: (v) => window.elementSdk.setConfig({ font_family: v }) },
+          fontSizeable: { get: () => config.font_size || defaultConfig.font_size, set: (v) => window.elementSdk.setConfig({ font_size: v }) }
+        }),
+        mapToEditPanelValues: (config) => new Map([
+          ["game_title", config.game_title || defaultConfig.game_title],
+          ["instructions", config.instructions || defaultConfig.instructions],
+          ["category_1_name", config.category_1_name || defaultConfig.category_1_name],
+          ["category_2_name", config.category_2_name || defaultConfig.category_2_name],
+          ["category_3_name", config.category_3_name || defaultConfig.category_3_name]
+        ])
       });
     }
+
+    document.addEventListener('DOMContentLoaded', render);
   </script>
- <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9c1a773af46f32bf',t:'MTc2OTAzNjgyNC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+ </body>
 </html>
