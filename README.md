@@ -59,9 +59,7 @@ This game is a small example of how I design experiences that do exactly that.
 ## Play the Game
 
 **Live version:**  
-https://yourusername.github.io/meet-jennie-interactive/
-
-(Replace with your actual link once published.)
+ https://jtookoian-lab.github.io/meet-jennie-interactive/
 
 ---
 
