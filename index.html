@@ -3,59 +3,21 @@
  <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Categorization Game</title>
+  <title>Meet Jennie Tookoian: Unlocking Conversations</title>
   <script src="/_sdk/element_sdk.js"></script>
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://fonts.googleapis.com/css2?family=Work+Sans:wght@400;600;700&amp;display=swap" rel="stylesheet">
   <style>
-    body {
-      box-sizing: border-box;
-      font-family: 'Work Sans', sans-serif;
-    }
-    
-    .dragging {
-      opacity: 0.5;
-      transform: rotate(2deg);
-    }
-    
-    .drag-over {
-      border-color: #00C4CC;
-      background-color: rgba(0, 196, 204, 0.1);
-      transform: scale(1.02);
-    }
-    
-    .item-card {
-      cursor: grab;
-      transition: all 0.2s ease;
-    }
-    
-    .item-card:active {
-      cursor: grabbing;
-    }
-    
-    .correct-drop {
-      animation: correctPulse 0.5s ease;
-    }
-    
-    .incorrect-drop {
-      animation: incorrectShake 0.5s ease;
-    }
-    
-    @keyframes correctPulse {
-      0%, 100% { transform: scale(1); }
-      50% { transform: scale(1.05); }
-    }
-    
-    @keyframes incorrectShake {
-      0%, 100% { transform: translateX(0); }
-      25% { transform: translateX(-10px); }
-      75% { transform: translateX(10px); }
-    }
-    
-    .bucket {
-      transition: all 0.3s ease;
-      min-height: 220px;
-    }
+    body { box-sizing: border-box; font-family: 'Work Sans', sans-serif; }
+    .dragging { opacity: 0.5; transform: rotate(2deg); }
+    .drag-over { border-color: #00C4CC; background-color: rgba(0, 196, 204, 0.1); transform: scale(1.02); }
+    .item-card { cursor: grab; transition: all 0.2s ease; }
+    .item-card:active { cursor: grabbing; }
+    .correct-drop { animation: correctPulse 0.5s ease; }
+    .incorrect-drop { animation: incorrectShake 0.5s ease; }
+    @keyframes correctPulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.05); } }
+    @keyframes incorrectShake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-10px); } 75% { transform: translateX(10px); } }
+    .bucket { transition: all 0.3s ease; min-height: 220px; }
   </style>
   <script src="/_sdk/data_sdk.js" type="text/javascript"></script>
  </head>
@@ -68,11 +30,11 @@
       primary_color: "#7D2AE7",
       accent_color: "#00C4CC",
       text_color: "#1A1A1A",
-      game_title: "Classroom to Boardroom: Career Journey",
-      instructions: "Sort my career history into the right buckets to see how I've evolved from the classroom to the boardroom!",
-      category_1_name: "The Toolbox",
-      category_2_name: "The Field Work",
-      category_3_name: "The Report Card",
+      game_title: "Meet Jennie Tookoian: Unlocking Conversations",
+      instructions: "In Enablement, engagement is never accidental. Match these career milestones to the right category to unlock a conversation starter for our next chat.",
+      category_1_name: "The 'How' (Skills)",
+      category_2_name: "The 'Where' (Experience)",
+      category_3_name: "The 'Proof' (Results)",
       font_family: "Work Sans",
       font_size: 16
     };
@@ -82,7 +44,7 @@
       { id: 2, text: "Started as a high school English teacher - learned to craft messages to a hostile audience! ", category: "skills" },
       { id: 3, text: "Seasoned: 15+ years in GTM and Enablement roles in SaaS", category: "experience" },
       { id: 4, text: "Held roles across the entire customer lifecycle from Marketing, Sales, Customer Service, and Support", category: "experience" },
-      { id: 5, text: "Have been Individual Contributor, Sales Coach, and built teams from scratch- will do it all!", category: "skills" },
+      { id: 5, text: "Have been Individual Contributor, Coach, and Leader- will do it all!", category: "skills" },
       { id: 6, text: "Sellers who passed certification increased 15% in closed-won deals last year", category: "results" },
       { id: 7, text: "Hit new business targets for 1st time in company history", category: "results" },
       { id: 8, text: "Exceeded renewal targets for 1st time in company history", category: "results" },
@@ -109,57 +71,59 @@
       const config = window.elementSdk?.config || defaultConfig;
       const baseSize = config.font_size || defaultConfig.font_size;
       const app = document.getElementById('app');
-      app.style.backgroundColor = config.background_color || defaultConfig.background_color;
+      app.style.backgroundColor = config.background_color;
       
       const shuffledItems = shuffleArray(gameItems);
       
       app.innerHTML = `
         <div class="w-full min-h-full p-8">
           <div class="max-w-6xl mx-auto mb-8 text-center">
-            <h1 id="title" class="font-bold mb-3" style="color: ${config.primary_color}; font-size: ${baseSize * 2}px;">
-              ${config.game_title}
-            </h1>
-            <p id="instructions" class="mb-4 max-w-2xl mx-auto" style="color: ${config.text_color}; font-size: ${baseSize * 1.125}px;">
-              ${config.instructions}
-            </p>
-            <div id="score-display" class="inline-block px-6 py-2 rounded-full" style="background-color: ${config.card_color}; border: 2px solid ${config.accent_color};">
-              <span style="color: ${config.text_color}; font-size: ${baseSize}px; font-weight: 600;">Score: <span id="current-score">0</span> / ${gameItems.length}</span>
+            <h1 class="font-bold mb-3" style="color: ${config.primary_color}; font-size: ${baseSize * 2}px;">${config.game_title}</h1>
+            <p class="mb-6 max-w-3xl mx-auto italic" style="color: ${config.text_color}; font-size: ${baseSize * 1.125}px;">${config.instructions}</p>
+            <div class="inline-block px-6 py-2 rounded-full mb-4" style="background-color: ${config.card_color}; border: 2px solid ${config.accent_color};">
+              <span style="color: ${config.text_color}; font-size: ${baseSize}px; font-weight: 600;">Topics Unlocked: <span id="current-score">0</span> / ${gameItems.length}</span>
             </div>
           </div>
 
           <div class="max-w-6xl mx-auto">
-            <div class="mb-10">
-              <h2 class="font-semibold mb-4 text-center opacity-70" style="color: ${config.text_color}; font-size: ${baseSize}px;">Items to Categorize</h2>
-              <div id="items-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                ${shuffledItems.map(item => `
-                  <div class="item-card p-4 rounded-lg shadow-md border-2" draggable="true" data-item-id="${item.id}" data-category="${item.category}"
-                    style="background-color: ${config.card_color}; border-color: ${config.primary_color}; color: ${config.text_color}; font-size: ${baseSize}px;">
-                    <p class="font-medium">${item.text}</p>
-                  </div>
-                `).join('')}
-              </div>
+            <div id="items-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-12">
+              ${shuffledItems.map(item => `
+                <div class="item-card p-4 rounded-lg shadow-md border-2 bg-white" draggable="true" data-item-id="${item.id}" data-category="${item.category}"
+                  style="border-color: ${config.primary_color}; color: ${config.text_color}; font-size: ${baseSize}px;">
+                  <p class="font-medium">${item.text}</p>
+                </div>
+              `).join('')}
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
               <div class="bucket rounded-xl p-6 border-4 border-dashed" data-bucket="skills" style="background-color: ${config.card_color}; border-color: ${config.primary_color};">
-                <h3 class="font-bold mb-4 text-center uppercase tracking-wider" style="color: ${config.primary_color}; font-size: ${baseSize * 1.1}px;">${config.category_1_name}</h3>
-                <div class="bucket-items space-y-3" data-bucket-content="skills"></div>
+                <h3 class="font-bold mb-4 text-center uppercase tracking-widest" style="color: ${config.primary_color};">${config.category_1_name}</h3>
+                <div class="bucket-items space-y-3"></div>
               </div>
               <div class="bucket rounded-xl p-6 border-4 border-dashed" data-bucket="experience" style="background-color: ${config.card_color}; border-color: ${config.accent_color};">
-                <h3 class="font-bold mb-4 text-center uppercase tracking-wider" style="color: ${config.accent_color}; font-size: ${baseSize * 1.1}px;">${config.category_2_name}</h3>
-                <div class="bucket-items space-y-3" data-bucket-content="experience"></div>
+                <h3 class="font-bold mb-4 text-center uppercase tracking-widest" style="color: ${config.accent_color};">${config.category_2_name}</h3>
+                <div class="bucket-items space-y-3"></div>
               </div>
               <div class="bucket rounded-xl p-6 border-4 border-dashed" data-bucket="results" style="background-color: ${config.card_color}; border-color: ${config.primary_color};">
-                <h3 class="font-bold mb-4 text-center uppercase tracking-wider" style="color: ${config.primary_color}; font-size: ${baseSize * 1.1}px;">${config.category_3_name}</h3>
-                <div class="bucket-items space-y-3" data-bucket-content="results"></div>
+                <h3 class="font-bold mb-4 text-center uppercase tracking-widest" style="color: ${config.primary_color};">${config.category_3_name}</h3>
+                <div class="bucket-items space-y-3"></div>
               </div>
             </div>
 
-            <div id="final-message" class="mt-8 text-center hidden">
-              <div class="inline-block p-8 rounded-2xl shadow-2xl" style="background-color: ${config.card_color}; border: 3px solid ${config.accent_color};">
-                <h2 class="font-bold mb-2" style="color: ${config.primary_color}; font-size: ${baseSize * 1.75}px;">🏆 Mastery Achieved!</h2>
-                <p id="final-score-text" class="font-semibold mb-4" style="color: ${config.text_color}; font-size: ${baseSize * 1.25}px;"></p>
-                <button onclick="window.location.reload()" class="px-6 py-2 rounded-lg text-white font-bold" style="background-color: ${config.primary_color};">Play Again</button>
+            <div id="final-message" class="mt-12 text-center hidden">
+              <div class="inline-block p-10 rounded-3xl shadow-2xl bg-white border-4" style="border-color: ${config.accent_color};">
+                <h2 class="font-bold mb-4" style="color: ${config.primary_color}; font-size: ${baseSize * 2}px;">Ready to Talk?</h2>
+                <p class="mb-6 text-lg" style="color: ${config.text_color};">You've unlocked all the topics. Which of these should we discuss first?</p>
+                
+                <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                  <button onclick="window.location.reload()" class="px-8 py-3 rounded-full border-2 font-bold text-lg transition-all hover:bg-gray-50" style="border-color: ${config.primary_color}; color: ${config.primary_color};">
+                    Refresh & Re-play
+                  </button>
+                  
+                  <a href="https://www.linkedin.com/in/jennie-tookoian/" target="_blank" class="px-8 py-3 rounded-full text-white font-bold text-lg shadow-lg transition-all hover:opacity-90 flex items-center justify-center no-underline" style="background-color: ${config.primary_color};">
+                    Connect on LinkedIn
+                  </a>
+                </div>
               </div>
             </div>
           </div>
@@ -177,7 +141,7 @@
       });
       buckets.forEach(bucket => {
         bucket.addEventListener('dragover', e => { e.preventDefault(); bucket.classList.add('drag-over'); });
-        bucket.addEventListener('dragleave', () => bucket.classList.remove('drag-over'));
+        bucket.addEventListener('dragleave', e => e.currentTarget.classList.remove('drag-over'));
         bucket.addEventListener('drop', handleDrop);
       });
     }
@@ -192,20 +156,18 @@
       const correctCategory = currentDraggedItem.dataset.category;
       const droppedCategory = bucket.dataset.bucket;
 
-      if (placedItems.has(itemId)) return;
-
       if (correctCategory === droppedCategory) {
         score++;
         placedItems.add(itemId);
         currentDraggedItem.classList.add('correct-drop');
         currentDraggedItem.style.borderColor = '#10B981';
-        currentDraggedItem.style.backgroundColor = '#D1FAE5';
+        currentDraggedItem.style.backgroundColor = '#F0FDF4';
         currentDraggedItem.draggable = false;
-        currentDraggedItem.style.cursor = 'default';
-        const check = document.createElement('span');
-        check.textContent = ' ✓';
-        check.style.color = '#10B981';
-        currentDraggedItem.querySelector('p').appendChild(check);
+        
+        const label = document.createElement('div');
+        label.innerHTML = '<span class="text-[10px] font-bold uppercase tracking-tighter text-emerald-600 block mt-1">✓ Topic Unlocked</span>';
+        currentDraggedItem.appendChild(label);
+        
         bucket.querySelector('.bucket-items').appendChild(currentDraggedItem);
       } else {
         currentDraggedItem.classList.add('incorrect-drop');
@@ -213,7 +175,6 @@
       }
       document.getElementById('current-score').textContent = score;
       if (placedItems.size === gameItems.length) {
-        document.getElementById('final-score-text').textContent = `You've successfully categorized all ${gameItems.length} milestones.`;
         document.getElementById('final-message').classList.remove('hidden');
       }
       currentDraggedItem = null;
