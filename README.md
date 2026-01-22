@@ -1,7 +1,7 @@
-# Meet Jennie Tookoian
+# Meet Jennie
 ### An Interactive Enablement Experience
 
-This project is an intentionally playful way to introduce how I think about **enablement, learning design, and audience engagement**.
+This project is a playful way to introduce how I think about **enablement, learning design, and audience engagement**.
 
 Rather than listing credentials, I built an experience that mirrors how I design field programs: 
 learner-first, conversation-driven, and grounded in learning science.
