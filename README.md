@@ -1,4 +1,4 @@
-# Meet Jennie
+# Meet Jennie Tookoian
 ### An Interactive Enablement Experience
 
 This project is an intentionally playful way to introduce how I think about **enablement, learning design, and audience engagement**.
@@ -10,13 +10,13 @@ learner-first, conversation-driven, and grounded in learning science.
 
 ## What This Is
 
-**Meet Jennie** is an interactive categorization game. 
+**Meet Jennie Tookoian** is an interactive categorization game. 
 Instead of a static resume, you are presented with career milestones that function as **conversation starters**. 
 
 As you sort these milestones into their correct categories—**The "How" (Skills)**, **The "Where" (Experience)**, and **The "Proof" (Results)**—you "unlock" them as topics for our future dialogue.
 
 The goal isn't just to sort the cards correctly. 
-The goal is to **curate a better conversation**.
+The goal is to **spark a better conversation**.
 
 ---
 
@@ -57,7 +57,7 @@ By turning my background into a game of discovery, I'm inviting you to be an act
 
 ## Play the Game
 
-**Live version:** [https://jtookoian-lab.github.io/meet-jennie-interactive/](https://jtookoian-lab.github.io/meet-jennie-interactive/)
+**Live version:** [https://jtookoian-lab.github.io/meet-jennie-interactive/]
 
 ---
 
